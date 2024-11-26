@@ -3,6 +3,18 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GitHubController;
+use App\Http\Controllers\Auth\TwoFactorAuthController;
+use App\Http\Controllers\Auth\SettingsController;
+
+
+Route::get('/two-factor', [TwoFactorAuthController::class, 'show'])->name('auth.two-factor');
+Route::post('/two-factor', [TwoFactorAuthController::class, 'verify']);
+Route::post('/two-factor/resend', [TwoFactorAuthController::class, 'resend'])->name('auth.two-factor.resend');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/two-factor', [SettingsController::class, 'toggleTwoFactor'])->name('settings.toggleTwoFactor');
+});
 
 Route::get('/', function () {
     return view('welcome');

@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Mail\TwoFactorCodeMail;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class LoginRequest extends FormRequest
 {
@@ -37,17 +41,34 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate()
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        
+        $user = User::where('email', $this->email)->first();
+    
+        if (!$user || !Hash::check($this->password, $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => __('auth.failed'),
             ]);
         }
+
+         // Armazena o ID do usuário na sessão se 2FA estiver ativado
+         if ($user->two_factor_enabled) {
+            $user->two_factor_code = rand(100000, 999999);
+            $user->two_factor_expires_at = now()->addMinutes(10);
+            $user->save();
+    
+            Mail::to($user->email)->send(new TwoFactorCodeMail($user->two_factor_code));
+            session(['auth.id' => $user->id]); // Armazena o ID do usuário na sessão
+            RateLimiter::clear($this->throttleKey());
+            return; // Nenhum redirecionamento aqui
+        }
+    
+        Auth::login($user, $this->boolean('remember'));
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -80,6 +101,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }

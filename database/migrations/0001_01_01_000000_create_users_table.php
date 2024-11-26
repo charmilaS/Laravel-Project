@@ -20,6 +20,9 @@ return new class extends Migration
 			$table->string('github_id')->nullable()->unique();
             $table->string('avatar')->nullable();
             $table->string('github_token')->nullable();
+            $table->boolean('two_factor_enabled')->default(false);
+            $table->string('two_factor_code')->nullable();
+            $table->timestamp('two_factor_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
