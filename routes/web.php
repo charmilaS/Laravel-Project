@@ -9,6 +9,15 @@ use App\Http\Controllers\JobMonitoringController;
 use App\Http\Controllers\TestResultadoController;
 
 
+use App\Models\UserLog;
+
+Route::get('/user-logs', function () {
+    $logs = UserLog::with('user')->latest()->paginate(10);
+    return view('user-logs.index', compact('logs'));
+})->middleware('auth');
+
+
+
 Route::get('/two-factor', [TwoFactorAuthController::class, 'show'])->name('auth.two-factor');
 Route::post('/two-factor', [TwoFactorAuthController::class, 'verify']);
 Route::post('/two-factor/resend', [TwoFactorAuthController::class, 'resend'])->name('auth.two-factor.resend');
@@ -22,7 +31,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/testes/resultados', [TestResultadoController::class, 'index'])->name('testes.resultados');
+
+Route::get('/resultados', [TestResultadoController::class, 'resultadosTeste'])->name('resultados');
 
 Route::get('/jobs/monitoramento', [JobMonitoringController::class, 'index'])->name('jobs.index');
 Route::post('/jobs/limpar', [JobMonitoringController::class, 'limparJobsFalhados'])->name('jobs.limpar');
@@ -42,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
 });
 
 require __DIR__.'/auth.php';
