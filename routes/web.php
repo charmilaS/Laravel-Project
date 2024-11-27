@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GitHubController;
 use App\Http\Controllers\Auth\TwoFactorAuthController;
 use App\Http\Controllers\Auth\SettingsController;
+use App\Http\Controllers\JobMonitoringController;
+use App\Http\Controllers\TestResultadoController;
 
 
 Route::get('/two-factor', [TwoFactorAuthController::class, 'show'])->name('auth.two-factor');
@@ -19,6 +21,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/testes/resultados', [TestResultadoController::class, 'index'])->name('testes.resultados');
+
+Route::get('/jobs/monitoramento', [JobMonitoringController::class, 'index'])->name('jobs.index');
+Route::post('/jobs/limpar', [JobMonitoringController::class, 'limparJobsFalhados'])->name('jobs.limpar');
+Route::post('/jobs/tentar', [JobMonitoringController::class, 'tentarJobsFalhados'])->name('jobs.tentar');
 
 Route::get('/auth/github', [GitHubController::class, 'redirect'])
     ->name('github.login');
