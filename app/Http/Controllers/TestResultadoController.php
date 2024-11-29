@@ -18,6 +18,29 @@ class TestResultadoController extends Controller
 
         return view('testes.resultados', compact('resultados'));
     }
+    public function resultadosTeste()
+{
+    $resultados = [
+        'total' => 10,
+        'passou' => 8,
+        'falhou' => 2,
+        'detalhes' => [
+            [
+                'nome' => 'Teste de Login',
+                'status' => 'passou',
+                'mensagem' => 'Login realizado com sucesso.',
+            ],
+            [
+                'nome' => 'Teste de Logs',
+                'status' => 'falhou',
+                'mensagem' => 'Log não registrado.',
+            ],
+        ],
+    ];
+
+    return view('testes.resultados', compact('resultados'));
+}
+
 
     private function processarResultadosTeste($output)
     {

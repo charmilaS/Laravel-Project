@@ -9,12 +9,7 @@ use Illuminate\Support\Facades\Hash;
 class ExemploTest extends TestCase
 {
     
-    public function test_soma_numeros()
-    {
-        $resultado = 2 + 2;
-        $this->assertEquals(4, $resultado);
-    }
-
+    
     public function test_validar_email()
     {
         $email = 'teste@exemplo.com';

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\DataProcessJob;
 
+
 abstract class Controller
 {
     
